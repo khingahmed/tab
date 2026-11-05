@@ -1,6 +1,7 @@
 /**
- * Split a total into `n` integer cent amounts that should sum to `totalCents`.
- * Leftover cents belong to the earliest people, one each.
+ * Split a total into `n` integer cent amounts that sum to `totalCents`.
+ * Each person gets the rounded-down share. Leftover cents go to the earliest
+ * people, one each.
  */
 export function splitEvenly(totalCents: number, n: number): number[] {
   if (!Number.isInteger(totalCents) || !Number.isInteger(n)) {
@@ -13,6 +14,7 @@ export function splitEvenly(totalCents: number, n: number): number[] {
     throw new Error("total cannot be negative");
   }
 
-  const each = Math.round(totalCents / n);
-  return Array.from({ length: n }, () => each);
+  const base = Math.floor(totalCents / n);
+  const leftover = totalCents - base * n;
+  return Array.from({ length: n }, (_, index) => (index < leftover ? base + 1 : base));
 }

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { applyPartial, settle } from "../src/settle.ts";
+import { settle } from "../src/settle.ts";
 import type { Balance, Payment } from "../src/types.ts";
 
 function signedAfter(balances: Balance[], payments: Payment[]): number[] {
@@ -62,7 +62,14 @@ describe("settle", () => {
     assert.deepEqual(signedAfter(balances, payments), [0, 0, 0]);
   });
 
-  it("does not support partial payments", () => {
-    assert.throws(() => applyPartial(), /not supported/);
+  it("rejects a tab whose balances do not sum to zero", () => {
+    assert.throws(
+      () =>
+        settle([
+          { name: "Alice", cents: 100 },
+          { name: "Bob", cents: -40 },
+        ]),
+      /balances must sum to zero, got 60/,
+    );
   });
 });

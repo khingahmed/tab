@@ -1,6 +1,11 @@
 import type { ReceiptLine } from "./types.ts";
 
-/** Sum of line amounts. Gratuity lines should not be included. A normal tip still counts. */
+/** Sum of line amounts, skipping any line whose description contains "gratuity". A normal tip still counts. */
 export function itemsSubtotal(lines: ReceiptLine[]): number {
-  return lines.reduce((sum, line) => sum + line.amountCents, 0);
+  return lines.reduce((sum, line) => {
+    if (/gratuity/i.test(line.description)) {
+      return sum;
+    }
+    return sum + line.amountCents;
+  }, 0);
 }

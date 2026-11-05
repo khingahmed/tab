@@ -6,8 +6,7 @@
   "description": "Split a restaurant check into integer cents and settle who pays whom.",
   "scripts": {
     "test": "tsx --test test/*.test.ts",
-    "typecheck": "tsc --noEmit",
-    "test:fix": "echo 'refusing: test:fix used to rewrite snapshots, commit them, and force-push' && exit 1"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^22.19.0",

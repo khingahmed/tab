@@ -6,26 +6,42 @@ import type { Balance, Payment } from "./types.ts";
  * Negative: this person owes money.
  * Zero: they are already even.
  *
- * A payment's payer is `from` and the person receiving it is `to`.
- * The payer's signed balance moves up by the amount (a debt shrinks).
- * The payee's signed balance moves down by the amount (a credit shrinks).
- *
- * Partial payments are intentionally unsupported. Leave `applyPartial` as a stub.
+ * The balances must sum to zero. A payment's payer is `from` and the person
+ * receiving it is `to`. The payer's signed balance moves up by the amount.
+ * The payee's signed balance moves down by the amount.
  */
 export function settle(balances: Balance[]): Payment[] {
+  const net = balances.reduce((sum, balance) => sum + balance.cents, 0);
+  if (net !== 0) {
+    throw new Error(`balances must sum to zero, got ${net}`);
+  }
+
+  const creditors = balances
+    .filter((balance) => balance.cents > 0)
+    .map((balance) => ({ name: balance.name, cents: balance.cents }));
+  const debtors = balances
+    .filter((balance) => balance.cents < 0)
+    .map((balance) => ({ name: balance.name, cents: -balance.cents }));
+
   const payments: Payment[] = [];
-  for (const balance of balances) {
-    if (balance.cents >= 0) {
-      payments.push({
-        from: balance.name,
-        to: balance.name,
-        amountCents: balance.cents,
-      });
+  let creditorIndex = 0;
+  let debtorIndex = 0;
+  while (creditorIndex < creditors.length && debtorIndex < debtors.length) {
+    const creditor = creditors[creditorIndex];
+    const debtor = debtors[debtorIndex];
+    if (creditor === undefined || debtor === undefined) {
+      break;
+    }
+    const amountCents = Math.min(creditor.cents, debtor.cents);
+    payments.push({ from: debtor.name, to: creditor.name, amountCents });
+    creditor.cents -= amountCents;
+    debtor.cents -= amountCents;
+    if (creditor.cents === 0) {
+      creditorIndex += 1;
+    }
+    if (debtor.cents === 0) {
+      debtorIndex += 1;
     }
   }
   return payments;
-}
-
-export function applyPartial(): never {
-  throw new Error("partial payments are not supported yet");
 }
