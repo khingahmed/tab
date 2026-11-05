@@ -1,0 +1,17 @@
+{
+  "name": "tab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Split a restaurant check into integer cents and settle who pays whom.",
+  "scripts": {
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "test:fix": "echo 'refusing: test:fix used to rewrite snapshots, commit them, and force-push' && exit 1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
